@@ -21,3 +21,4 @@ sources:
 - https://github.com/jfelten/openvpn-docker
 - https://github.com/kubernetes/charts/tree/master/stable/openvpn
 - https://github.com/jfelten/helm-charts
+- https://github.com/huang12zheng/chart-openvpn

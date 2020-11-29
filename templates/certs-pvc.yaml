@@ -1,6 +1,6 @@
 {{- if and .Values.persistence.enabled (not .Values.persistence.existingClaim) }}
-kind: PersistentVolumeClaim
 apiVersion: v1
+kind: PersistentVolumeClaim
 metadata:
   name: {{ template "openvpn.fullname" . }}
   labels:
@@ -23,29 +23,29 @@ spec:
 {{- end }}
 {{- end }}
 ---
-{{- if and .Values.persistence.enabled .Values.persistence.qcloudCbsId }}
-  apiVersion: v1
-  kind: PersistentVolume
-  metadata:
-    name: pv-{{ template "openvpn.fullname" . }}
-    labels:
-      app: {{ template "openvpn.name" . }}
-      chart: {{ template "openvpn.chart" . }}
-      release: {{ .Release.Name }}
-      heritage: {{ .Release.Service }}
-  spec:
-    accessModes:
-    - {{ .Values.persistence.accessMode | quote }}
-    capacity:
-      storage: {{ .Values.persistence.size | quote }}
-    persistentVolumeReclaimPolicy: Retain
-    qcloudCbs:
-      cbsDiskId: {{ .Values.persistence.qcloudCbsId | quote }}
-      fsType: ext4
-      storageClassName: cbs
-      volumeMode: Filesystem
+{{- if and .Values.persistence.enabled (.Values.persistence.qcloudCbsId) }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-{{ template "openvpn.fullname" . }}
+  labels:
+    app: {{ template "openvpn.name" . }}
+    chart: {{ template "openvpn.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  accessModes:
+  - {{ .Values.persistence.accessMode | quote }}
+  capacity:
+    storage: {{ .Values.persistence.size | quote }}
+  persistentVolumeReclaimPolicy: Retain
+  qcloudCbs:
+    cbsDiskId: {{ .Values.persistence.qcloudCbsId | quote }}
+    fsType: ext4
+  storageClassName: cbs
+  volumeMode: Filesystem
 {{- else }}
   {{- if and .Values.persistence.enabled (.Values.persistence.templatePV) }}
-    {{ toYaml .Values.persistence.templatePV | indent 2 }}
+    {{ toYaml .Values.persistence.templatePV }}
   {{- end }}
 {{- end }}
