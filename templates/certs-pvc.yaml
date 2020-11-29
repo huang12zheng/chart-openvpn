@@ -22,3 +22,7 @@ spec:
 {{- end }}
 {{- end }}
 {{- end }}
+---
+{{- if and .Values.persistence.enabled (.Values.persistence.templatePV) }}
+{{ toYaml .Values.openvpn.templatePV | indent 2 }}
+{{- end }}
