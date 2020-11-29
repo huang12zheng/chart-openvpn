@@ -72,6 +72,9 @@ persistence:
   size: 2M
   ## template of PersistentVolume
   # templatePV:
+  ## id of qcloudCbs,for create PV
+  # qcloudCbsId: disk-0mr48u75
+
   
 openvpn:
   # Network allocated for openvpn clients (default: 10.240.0.0).
