@@ -13,6 +13,7 @@ data:
     EASY_RSA_LOC="/etc/openvpn/certs"
     cd $EASY_RSA_LOC
     SERVER_CERT="${EASY_RSA_LOC}/pki/issued/server.crt"
+    # source genvars.sh
     if [ -e "$SERVER_CERT" ]
     then
       echo "found existing certs - reusing"
@@ -35,7 +36,15 @@ data:
     else
       cp -R /usr/share/easy-rsa/* $EASY_RSA_LOC
       ./easyrsa init-pki
+      {{- if (not .Values.openvpn.rsaSecret) }}
       echo "ca\n" | ./easyrsa build-ca nopass
+      {{ else }}
+      ./easyrsa build-ca <<EOF
+      {{.Values.openvpn.rsaSecret.passPhrase}}
+      {{.Values.openvpn.rsaSecret.passPhrase}}
+      {{.Values.openvpn.rsaSecret.cn }}
+      EOF
+      {{- end }}
       ./easyrsa build-server-full server nopass
       ./easyrsa gen-dh
       {{- if .Values.openvpn.useCrl }}
