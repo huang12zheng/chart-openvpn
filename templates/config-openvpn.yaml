@@ -8,12 +8,14 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 data:
+  vars: {{ .Values.openvpn.base64Var }}
   setup-certs.sh: |-
     #!/bin/bash
     EASY_RSA_LOC="/etc/openvpn/certs"
     cd $EASY_RSA_LOC
     SERVER_CERT="${EASY_RSA_LOC}/pki/issued/server.crt"
     # source genvars.sh
+    [ -e "/etc/openvpn/setup/vars" ] && EASYRSA_VARS_FILE="/etc/openvpn/setup/vars"
     if [ -e "$SERVER_CERT" ]
     then
       echo "found existing certs - reusing"
@@ -35,17 +37,17 @@ data:
       {{- end }}
     else
       cp -R /usr/share/easy-rsa/* $EASY_RSA_LOC
-      ./easyrsa init-pki
+      echo yes | ./easyrsa init-pki
       {{- if (not .Values.openvpn.rsaSecret) }}
       echo "ca\n" | ./easyrsa build-ca nopass
       {{ else }}
       ./easyrsa build-ca <<EOF
-      {{.Values.openvpn.rsaSecret.passPhrase}}
-      {{.Values.openvpn.rsaSecret.passPhrase}}
-      {{.Values.openvpn.rsaSecret.cn }}
-      EOF
+    {{.Values.openvpn.rsaSecret.passPhrase}}
+    {{.Values.openvpn.rsaSecret.passPhrase}}
+    {{.Values.openvpn.rsaSecret.cn }}
+    EOF
       {{- end }}
-      ./easyrsa build-server-full server nopass
+      echo {{.Values.openvpn.rsaSecret.passPhrase}} |./easyrsa build-server-full server nopass
       ./easyrsa gen-dh
       {{- if .Values.openvpn.useCrl }}
       ./easyrsa gen-crl
@@ -138,8 +140,7 @@ data:
 
           echo ${netOctets#.}
       }
-
-      /etc/openvpn/setup/setup-certs.sh
+      /etc/openvpn/setup/setup-certs.sh || ( rm -fr /etc/openvpn/certs/* && /etc/openvpn/setup/setup-certs.sh )
 {{ if .Values.openvpn.istio.enabled }}
       iptables -t nat -A PREROUTING -s {{ .Values.openvpn.OVPN_NETWORK }}/{{ .Values.openvpn.OVPN_SUBNET }} -i tun0 -p tcp -j REDIRECT --to-ports {{ .Values.openvpn.istio.proxy.port }}
 {{ end }}
