@@ -8,7 +8,8 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 data:
-  #vars: {{ .Values.openvpn.vars | indent 4 }}
+  vars: |-
+{{ .Values.openvpn.vars |indent 4}}
 
   setup-certs.sh: |-
     #!/bin/bash
