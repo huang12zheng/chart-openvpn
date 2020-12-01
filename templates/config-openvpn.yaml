@@ -8,9 +8,12 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 data:
-  vars: {{ .Values.openvpn.base64Var }}
+  #vars: {{ .Values.openvpn.vars | indent 4 }}
+
   setup-certs.sh: |-
     #!/bin/bash
+    set -x
+    set -e
     EASY_RSA_LOC="/etc/openvpn/certs"
     cd $EASY_RSA_LOC
     SERVER_CERT="${EASY_RSA_LOC}/pki/issued/server.crt"
@@ -50,7 +53,7 @@ data:
       echo {{.Values.openvpn.rsaSecret.passPhrase}} |./easyrsa build-server-full server nopass
       ./easyrsa gen-dh
       {{- if .Values.openvpn.useCrl }}
-      ./easyrsa gen-crl
+      echo {{.Values.openvpn.rsaSecret.passPhrase}} |./easyrsa gen-crl
       cp ${EASY_RSA_LOC}/pki/crl.pem ${EASY_RSA_LOC}/crl.pem # Note: the pki/ directory is inaccessible after openvpn drops privileges, so we cp crl.pem to ${EASY_RSA_LOC} to allow CRL updates without a restart
       chmod 644 ${EASY_RSA_LOC}/crl.pem
       {{- end }}

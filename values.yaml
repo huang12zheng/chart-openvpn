@@ -13,8 +13,9 @@ updateStrategy: {}
 imagePullSecretName:
 
 image:
-  repository: jfelten/openvpn-docker
-  tag: 1.1.0
+  # depolyment.yaml<< image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+  repository: hzgood/openvpn-docker
+  tag: latest
   pullPolicy: IfNotPresent
 service:
   type: LoadBalancer
@@ -113,6 +114,7 @@ openvpn:
   # serverConf: |
   #  max-clients 100
   #  client-to-client
+  vars: ""
 
   # Lines appended to the end of the client configuration file
   # Example: if all of your clients are Ubuntu (18.04+) you may need to install
