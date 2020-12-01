@@ -41,20 +41,21 @@ data:
       {{- end }}
     else
       cp -R /usr/share/easy-rsa/* $EASY_RSA_LOC
+      cp ../setup/vars vars
       echo yes | ./easyrsa init-pki
-      {{- if (not .Values.openvpn.rsaSecret) }}
+{{- if (not .Values.openvpn.passPhrase) }}
       echo "ca\n" | ./easyrsa build-ca nopass
-      {{ else }}
+{{ else }}
       ./easyrsa build-ca <<EOF
-    {{.Values.openvpn.rsaSecret.passPhrase}}
-    {{.Values.openvpn.rsaSecret.passPhrase}}
-    {{.Values.openvpn.rsaSecret.cn }}
+    {{.Values.openvpn.passPhrase}}
+    {{.Values.openvpn.passPhrase}}
+    {{.Values.openvpn.ca_input_extra }}
     EOF
-      {{- end }}
-      echo {{.Values.openvpn.rsaSecret.passPhrase}} |./easyrsa build-server-full server nopass
+{{- end }}
+      echo {{.Values.openvpn.passPhrase}} |./easyrsa build-server-full server nopass
       ./easyrsa gen-dh
       {{- if .Values.openvpn.useCrl }}
-      echo {{.Values.openvpn.rsaSecret.passPhrase}} |./easyrsa gen-crl
+      echo {{.Values.openvpn.passPhrase}} |./easyrsa gen-crl
       cp ${EASY_RSA_LOC}/pki/crl.pem ${EASY_RSA_LOC}/crl.pem # Note: the pki/ directory is inaccessible after openvpn drops privileges, so we cp crl.pem to ${EASY_RSA_LOC} to allow CRL updates without a restart
       chmod 644 ${EASY_RSA_LOC}/crl.pem
       {{- end }}

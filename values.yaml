@@ -115,7 +115,19 @@ openvpn:
   #  max-clients 100
   #  client-to-client
   vars: ""
-  ## example
+  cn: "ca"
+  ## example1
+  # rsaSecret:
+  #   passPhrase: caca
+  #   cn: zhifou
+  # vars: |-
+  #   set_var EASYRSA_DN "cn_only"
+  #   set_var EASYRSA_ALGO ed
+  #   set_var EASYRSA_CURVE ed448
+  ## example2
+  # rsaSecret:
+  #   passPhrase: caca
+  # cn: "\n\n\n\n\n\n"
   # vars: |-
   #   set_var EASYRSA_DN "org"
   #   set_var EASYRSA_REQ_COUNTRY "CN"
@@ -125,6 +137,9 @@ openvpn:
   #   set_var EASYRSA_REQ_EMAIL "805104533@qq.com"
   #   set_var EASYRSA_REQ_OU "ZhiFou"
   #   set_var EASYRSA_ALGO ed
+  #   set_var EASYRSA_CURVE ed448
+  
+  # ca_input_extra: ""
 
   # Lines appended to the end of the client configuration file
   # Example: if all of your clients are Ubuntu (18.04+) you may need to install
